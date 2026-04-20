@@ -1,0 +1,33 @@
+# ------------------------------------------------------------------------------
+# TSW-HA-Bridge — Home Assistant configuration additions
+# Merge these sections into your existing configuration.yaml
+# Add a new shell_command block for each panel you add
+# ------------------------------------------------------------------------------
+
+# Shell commands — one set per panel
+# Rename panel_1 to something descriptive (e.g. living_room, kitchen)
+shell_command:
+  crestron_open_browser_panel_1: >
+    python3 /config/scripts/crestron_cmd.py 'BROWSEROPEN http://192.168.1.X:8123' 192.168.1.XX
+  crestron_standby_panel_1: >
+    python3 /config/scripts/crestron_cmd.py 'standby' 192.168.1.XX
+  crestron_wake_panel_1: >
+    python3 /config/scripts/crestron_cmd.py 'standby off' 192.168.1.XX
+
+# Allow HA to be loaded in an iframe on the panel
+http:
+  use_x_frame_options: false
+
+# Auto-login for panel — no credentials prompt on the display
+homeassistant:
+  auth_providers:
+    - type: trusted_networks
+      trusted_networks:
+        - 192.168.1.XX/32    # Panel 1 — add a line per panel
+      allow_bypass_login: true
+    - type: homeassistant    # keeps normal login for everything else
+
+# Side button handler — loaded globally, only activates on the panel
+frontend:
+  extra_js_url_es5:
+    - /local/crestron-panel.js

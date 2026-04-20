@@ -1,0 +1,30 @@
+# ------------------------------------------------------------------------------
+# TSW-HA-Bridge — Home Assistant automations
+# Import these into HA via Settings > Automations > three dots > Import YAML
+# Add a new automation per panel, duplicating the boot trigger block
+# ------------------------------------------------------------------------------
+
+# Fires when the panel boots and the CH5 app sends the webhook
+# The CH5 app webhook ID must match the one set in the setup wizard
+- alias: "TSW - Boot Browser Panel 1"
+  description: "Opens HA dashboard when panel boots"
+  trigger:
+    - platform: webhook
+      webhook_id: tsw-open-browser-panel-1
+  action:
+    - service: shell_command.crestron_open_browser_panel_1
+  mode: single
+
+# Optional — restarts the browser every 6 hours to clear memory
+- alias: "TSW - Periodic Browser Restart Panel 1"
+  description: "Fully restarts the browser to reclaim memory"
+  trigger:
+    - platform: time_pattern
+      hours: "/6"
+  action:
+    - service: shell_command.crestron_standby_panel_1
+    - delay: "00:00:05"
+    - service: shell_command.crestron_wake_panel_1
+    - delay: "00:00:10"
+    - service: shell_command.crestron_open_browser_panel_1
+  mode: single
